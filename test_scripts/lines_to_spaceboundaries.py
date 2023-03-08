@@ -1,4 +1,4 @@
-from Autodesk.Revit.DB import Transaction, XYZ, BuiltInParameter, BuiltInCategory, FilteredElementCollector, ImportInstance
+from Autodesk.Revit.DB import Transaction, XYZ, CurveArray, BuiltInParameter, BuiltInCategory, FilteredElementCollector, ImportInstance
 import Autodesk.Revit.DB as DB
 doc = __revit__.ActiveUIDocument.Document
 op = doc.Application.Create.NewGeometryOptions()
@@ -28,9 +28,12 @@ g = geo[0]
 e = eles[0]
 #print(g, e)
 me_walls = []
+curve_arr = CurveArray()
+
 for ln in eles:
 	if ln.LineStyle.Name == "ME-WALL":
-		# me_walls.append(doc.Create.NewLine())
-		t.Start("Ref")
-		doc.Create.NewSpaceBoundaryLines(doc.ActiveView.SketchPlane, ln, doc.ActiveView)
-		t.Commit()
+		curve_arr.Append(ln.GeometryCurve)
+        
+t.Start("Space boundary")
+doc.Create.NewSpaceBoundaryLines(doc.ActiveView.SketchPlane, curve_arr, doc.ActiveView)
+t.Commit()
